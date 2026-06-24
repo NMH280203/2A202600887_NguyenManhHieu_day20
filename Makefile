@@ -21,5 +21,11 @@ run-baseline:
 run-multi:
 	python -m multi_agent_research_lab.cli multi-agent --query "Research GraphRAG state-of-the-art"
 
+run-benchmark:
+	python -m multi_agent_research_lab.cli benchmark --query "Research GraphRAG state-of-the-art"
+
+run-multi-trace:
+	python -m multi_agent_research_lab.cli multi-agent --query "Research GraphRAG state-of-the-art" --trace-dir reports/traces
+
 clean:
 	rm -rf .pytest_cache .ruff_cache .mypy_cache dist build *.egg-info

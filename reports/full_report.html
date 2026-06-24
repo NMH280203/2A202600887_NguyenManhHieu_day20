@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 20 — Multi-Agent Research System — Báo cáo đầy đủ</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface2: #243044;
+      --border: #2d3f5c;
+      --text: #e8edf4;
+      --muted: #8b9cb3;
+      --accent: #3b82f6;
+      --accent2: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --purple: #a78bfa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+    .layout { display: flex; min-height: 100vh; }
+    nav {
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    nav h2 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    nav a {
+      display: block;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      margin-bottom: 0.15rem;
+      transition: all 0.15s;
+    }
+    nav a:hover, nav a.active { background: var(--surface2); color: var(--text); }
+    main {
+      flex: 1;
+      max-width: 960px;
+      padding: 2.5rem 3rem 4rem;
+    }
+    header.hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1a2332 60%, #0f1419 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+    header.hero h1 { font-size: 1.85rem; font-weight: 700; margin-bottom: 0.5rem; }
+    header.hero .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 1.25rem; }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+    .meta-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+    }
+    .meta-card .label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .meta-card .value { font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem; }
+    section { margin-bottom: 3rem; scroll-margin-top: 1rem; }
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      display: inline-block;
+    }
+    h3 { font-size: 1.1rem; margin: 1.5rem 0 0.75rem; color: var(--accent2); }
+    h4 { font-size: 0.95rem; margin: 1rem 0 0.5rem; color: var(--purple); }
+    p { margin-bottom: 0.85rem; color: #c8d4e3; }
+    ul, ol { margin: 0.5rem 0 1rem 1.5rem; color: #c8d4e3; }
+    li { margin-bottom: 0.35rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .card.highlight { border-left: 4px solid var(--accent); }
+    .card.success { border-left: 4px solid var(--accent2); }
+    .card.warn { border-left: 4px solid var(--warn); }
+    .card.danger { border-left: 4px solid var(--danger); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th { background: var(--surface2); color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:hover td { background: rgba(59,130,246,0.05); }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge.green { background: rgba(16,185,129,0.2); color: #34d399; }
+    .badge.yellow { background: rgba(245,158,11,0.2); color: #fbbf24; }
+    .badge.red { background: rgba(239,68,68,0.2); color: #f87171; }
+    .badge.blue { background: rgba(59,130,246,0.2); color: #60a5fa; }
+    pre, code {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      font-size: 0.82rem;
+    }
+    pre {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      margin: 0.75rem 0 1rem;
+      color: #a8d4a8;
+      line-height: 1.5;
+    }
+    code { background: var(--surface2); padding: 0.1rem 0.4rem; border-radius: 4px; color: #93c5fd; }
+    .flow {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 1rem 0;
+    }
+    .flow-step {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.85rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .flow-arrow { color: var(--muted); font-size: 1.1rem; }
+    .bar-chart { margin: 1rem 0; }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 160px 1fr 60px;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.85rem;
+    }
+    .bar-track {
+      background: var(--surface2);
+      border-radius: 4px;
+      height: 22px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding-left: 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #fff;
+      min-width: 2px;
+    }
+    .bar-fill.blue { background: linear-gradient(90deg, #2563eb, #3b82f6); }
+    .bar-fill.green { background: linear-gradient(90deg, #059669, #10b981); }
+    .bar-fill.purple { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+    .bar-fill.orange { background: linear-gradient(90deg, #d97706, #f59e0b); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 800px) {
+      .layout { flex-direction: column; }
+      nav { width: 100%; height: auto; position: static; }
+      main { padding: 1.5rem; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 120px 1fr 50px; }
+    }
+    .score-ring {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 1rem;
+      border: 3px solid;
+    }
+    .score-high { border-color: var(--accent2); color: var(--accent2); }
+    .score-mid { border-color: var(--warn); color: var(--warn); }
+    .toc-output {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      max-height: 320px;
+      overflow-y: auto;
+      font-size: 0.82rem;
+      color: #b0bec5;
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <nav>
+    <h2>Mục lục</h2>
+    <a href="#overview">Tổng quan</a>
+    <a href="#architecture">Kiến trúc</a>
+    <a href="#implementation">Triển khai</a>
+    <a href="#improvements">Cải tiến</a>
+    <a href="#benchmark">Benchmark</a>
+    <a href="#prompt-eval">Đánh giá 4 Prompt</a>
+    <a href="#prompt-1">↳ Prompt 1</a>
+    <a href="#prompt-2">↳ Prompt 2</a>
+    <a href="#prompt-3">↳ Prompt 3</a>
+    <a href="#prompt-4">↳ Prompt 4</a>
+    <a href="#trace-export">Trace Export</a>
+    <a href="#failure-modes">Failure Modes</a>
+    <a href="#conclusion">Kết luận</a>
+    <a href="#appendix">Phụ lục</a>
+  </nav>
+
+  <main>
+    <header class="hero" id="overview">
+      <h1>Lab 20: Multi-Agent Research System</h1>
+      <p class="subtitle">Báo cáo đầy đủ — Triển khai, benchmark, đánh giá prompt &amp; cải tiến chất lượng</p>
+      <div class="meta-grid">
+        <div class="meta-card"><div class="label">Sinh viên</div><div class="value">Nguyễn Mạnh Hiệu</div></div>
+        <div class="meta-card"><div class="label">MSSV</div><div class="value">2A202600887</div></div>
+        <div class="meta-card"><div class="label">Ngày báo cáo</div><div class="value">24/06/2026</div></div>
+        <div class="meta-card"><div class="label">Model</div><div class="value">gpt-4o-mini</div></div>
+        <div class="meta-card"><div class="label">Agents</div><div class="value">5 (+ Supervisor)</div></div>
+        <div class="meta-card"><div class="label">Tests</div><div class="value">11/11 pass</div></div>
+        <div class="meta-card"><div class="label">Trace</div><div class="value">JSON + MD</div></div>
+      </div>
+    </header>
+
+    <!-- OVERVIEW -->
+    <section>
+      <h2>Mục tiêu dự án</h2>
+      <p>Xây dựng hệ thống nghiên cứu đa agent gồm <strong>Supervisor, Researcher, Analyst, Writer, Critic</strong>, so sánh với single-agent baseline theo các tiêu chí <em>quality, latency, cost</em>. Hệ thống được triển khai trên skeleton Lab 20 với LangGraph, OpenAI, Tavily search, tracing và benchmark tự động.</p>
+      <div class="card highlight">
+        <strong>Deliverables đã hoàn thành:</strong>
+        <ul>
+          <li>Implement đầy đủ LLM client, Search client, 5 agents, LangGraph workflow</li>
+          <li>CLI: <code>baseline</code>, <code>multi-agent</code>, <code>benchmark</code></li>
+          <li>Báo cáo benchmark: <code>reports/benchmark_report.md</code></li>
+          <li>Đánh giá 4 research prompts: <code>reports/prompt_evaluations/</code></li>
+          <li>Cải tiến Tavily (query truncation) + Critic loop khi citation coverage thấp</li>
+          <li>Trace export tự động: <code>reports/traces/latest.json</code> &amp; <code>latest.md</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <section id="architecture">
+      <h2>Kiến trúc hệ thống</h2>
+      <div class="flow">
+        <span class="flow-step">User Query</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step" style="border-color:#3b82f6">Supervisor</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Researcher</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Analyst</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Writer</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step" style="border-color:#a78bfa">Critic</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step" style="border-color:#3b82f6">Supervisor</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step" style="border-color:#10b981">Done</span>
+      </div>
+      <p>Nếu Critic phát hiện <code>citation_coverage &lt; 0.5</code>, Supervisor gửi lại Writer (tối đa 2 lần revision) trước khi kết thúc.</p>
+
+      <h3>Shared State (<code>ResearchState</code>)</h3>
+      <table>
+        <thead><tr><th>Field</th><th>Mô tả</th></tr></thead>
+        <tbody>
+          <tr><td><code>sources</code></td><td>Tài liệu từ Tavily search</td></tr>
+          <tr><td><code>research_notes</code></td><td>Ghi chú tổng hợp từ Researcher</td></tr>
+          <tr><td><code>analysis_notes</code></td><td>Phân tích claims, evidence từ Analyst</td></tr>
+          <tr><td><code>final_answer</code></td><td>Câu trả lời cuối từ Writer</td></tr>
+          <tr><td><code>citation_coverage</code></td><td>Tỷ lệ claims có citation [n]</td></tr>
+          <tr><td><code>critic_feedback</code></td><td>Phản hồi từ Critic cho vòng revision</td></tr>
+          <tr><td><code>route_history</code></td><td>Lịch sử routing để trace/debug</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Guardrails</h3>
+      <ul>
+        <li><code>MAX_ITERATIONS=10</code> — giới hạn vòng supervisor</li>
+        <li><code>TIMEOUT_SECONDS=60</code> — timeout API calls</li>
+        <li>Tenacity retry (3 lần) cho OpenAI</li>
+        <li>Mock fallback khi không có API key hoặc Tavily lỗi</li>
+      </ul>
+    </section>
+
+    <!-- IMPLEMENTATION -->
+    <section id="implementation">
+      <h2>Chi tiết triển khai</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h4>Services</h4>
+          <ul>
+            <li><code>llm_client.py</code> — OpenAI, retry, cost estimate</li>
+            <li><code>search_client.py</code> — Tavily + query truncation</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Agents</h4>
+          <ul>
+            <li><code>supervisor.py</code> — routing policy</li>
+            <li><code>researcher.py</code> — search + summarize</li>
+            <li><code>analyst.py</code> — claims analysis</li>
+            <li><code>writer.py</code> — synthesis + citations</li>
+            <li><code>critic.py</code> — fact-check loop</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Graph</h4>
+          <ul>
+            <li><code>workflow.py</code> — LangGraph StateGraph</li>
+            <li>Conditional edges từ Supervisor</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Evaluation &amp; Observability</h4>
+          <ul>
+            <li><code>benchmark.py</code> — latency, cost, quality</li>
+            <li><code>report.py</code> — markdown report</li>
+            <li><code>tracing.py</code> — local span buffer + LangSmith hook</li>
+            <li><code>trace_export.py</code> — export JSON/Markdown artifacts</li>
+            <li><code>scripts/run_evaluation_prompts.py</code></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMPROVEMENTS -->
+    <section id="improvements">
+      <h2>Cải tiến chất lượng</h2>
+      <div class="card success">
+        <h4>1. Sửa Tavily API (HTTP 400)</h4>
+        <p><strong>Nguyên nhân:</strong> Tavily giới hạn query tối đa 400 ký tự. Prompt dài (hàng nghìn ký tự) gây lỗi 400 → fallback mock <code>example.com</code>.</p>
+        <p><strong>Giải pháp:</strong> Thêm <code>utils/query.py → extract_search_query()</code> — ưu tiên text trong dấu ngoặc kép, câu hỏi, rồi truncate an toàn.</p>
+        <p><strong>Kết quả:</strong> Prompt 2 search thành công với query 85 ký tự → sources thật (arxiv.org, superannotate.com, …).</p>
+      </div>
+      <div class="card success">
+        <h4>2. Critic Agent + vòng lặp Supervisor</h4>
+        <p>Luồng mới: <code>… → writer → critic → supervisor</code>. Nếu <code>citation_coverage &lt; MIN_CITATION_COVERAGE (0.5)</code> → Writer revision (tối đa <code>MAX_WRITER_REVISIONS=2</code>).</p>
+        <p>Test thực tế: routes <code>researcher → analyst → writer → critic → done</code>, coverage = <strong>1.00</strong>.</p>
+      </div>
+    </section>
+
+    <!-- BENCHMARK -->
+    <section id="benchmark">
+      <h2>Benchmark: Single-Agent vs Multi-Agent</h2>
+      <p>Query: <em>"What is GraphRAG? Summarize in 200 words."</em></p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Run</th>
+            <th class="num">Latency (s)</th>
+            <th class="num">Cost (USD)</th>
+            <th class="num">Quality</th>
+            <th>Citation</th>
+            <th>Routes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Single-agent baseline</td>
+            <td class="num">15.97</td>
+            <td class="num">0.0004</td>
+            <td class="num">7.0</td>
+            <td><span class="badge green">1.00</span></td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Multi-agent workflow</td>
+            <td class="num">47.68</td>
+            <td class="num">0.0013</td>
+            <td class="num">10.0</td>
+            <td><span class="badge green">1.00</span></td>
+            <td>researcher → analyst → writer → done</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>So sánh trực quan</h3>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <span>Latency (s)</span>
+          <div class="bar-track">
+            <div class="bar-fill blue" style="width:33%">Baseline 15.97s</div>
+          </div>
+          <span class="num">15.97</span>
+        </div>
+        <div class="bar-row">
+          <span></span>
+          <div class="bar-track">
+            <div class="bar-fill orange" style="width:100%">Multi-agent 47.68s</div>
+          </div>
+          <span class="num">47.68</span>
+        </div>
+        <div class="bar-row">
+          <span>Quality (0-10)</span>
+          <div class="bar-track">
+            <div class="bar-fill blue" style="width:70%">Baseline 7.0</div>
+          </div>
+          <span class="num">7.0</span>
+        </div>
+        <div class="bar-row">
+          <span></span>
+          <div class="bar-track">
+            <div class="bar-fill green" style="width:100%">Multi-agent 10.0</div>
+          </div>
+          <span class="num">10.0</span>
+        </div>
+        <div class="bar-row">
+          <span>Cost (USD)</span>
+          <div class="bar-track">
+            <div class="bar-fill blue" style="width:31%">$0.0004</div>
+          </div>
+          <span class="num">0.0004</span>
+        </div>
+        <div class="bar-row">
+          <span></span>
+          <div class="bar-track">
+            <div class="bar-fill purple" style="width:100%">$0.0013</div>
+          </div>
+          <span class="num">0.0013</span>
+        </div>
+      </div>
+
+      <div class="card warn">
+        <strong>Phân tích:</strong> Multi-agent chậm hơn <strong>+31.7s</strong> và tốn hơn <strong>+$0.0009</strong>, nhưng quality heuristic cao hơn <strong>+3.0 điểm</strong>. Trade-off hợp lý cho task nghiên cứu cần cấu trúc và citation.
+      </div>
+    </section>
+
+    <!-- PROMPT EVALUATION -->
+    <section id="prompt-eval">
+      <h2>Đánh giá 4 Research Prompts</h2>
+      <p>Chạy qua <code>scripts/run_evaluation_prompts.py</code> — mỗi prompt là một task nghiên cứu/thiết kế phức tạp từ bộ đánh giá Multi-Agent LLM Research Evaluation.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Prompt</th>
+            <th class="num">Latency</th>
+            <th class="num">Words</th>
+            <th class="num">Sections</th>
+            <th class="num">Quality</th>
+            <th class="num">Citation</th>
+            <th>Đánh giá</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>P1: Benchmark Design</td>
+            <td class="num">42.8s</td>
+            <td class="num">622</td>
+            <td class="num">100%</td>
+            <td class="num">9.0</td>
+            <td class="num">0.0</td>
+            <td><span class="badge yellow">Khá tốt</span></td>
+          </tr>
+          <tr>
+            <td>P2: Multi-Agent Briefing</td>
+            <td class="num">35.3s</td>
+            <td class="num">544</td>
+            <td class="num">100%</td>
+            <td class="num">10.0</td>
+            <td class="num">1.0</td>
+            <td><span class="badge green">Xuất sắc</span></td>
+          </tr>
+          <tr>
+            <td>P3: Experimental Design</td>
+            <td class="num">44.4s</td>
+            <td class="num">738</td>
+            <td class="num">100%</td>
+            <td class="num">9.0</td>
+            <td class="num">0.0</td>
+            <td><span class="badge green">Tốt</span></td>
+          </tr>
+          <tr>
+            <td>P4: Survey Blueprint</td>
+            <td class="num">62.7s</td>
+            <td class="num">899</td>
+            <td class="num">100%</td>
+            <td class="num">9.0</td>
+            <td class="num">0.0</td>
+            <td><span class="badge yellow">Khá tốt</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bar-chart">
+        <div class="bar-row"><span>P1 Latency</span><div class="bar-track"><div class="bar-fill blue" style="width:68%"></div></div><span>42.8s</span></div>
+        <div class="bar-row"><span>P2 Latency</span><div class="bar-track"><div class="bar-fill green" style="width:56%"></div></div><span>35.3s</span></div>
+        <div class="bar-row"><span>P3 Latency</span><div class="bar-track"><div class="bar-fill blue" style="width:71%"></div></div><span>44.4s</span></div>
+        <div class="bar-row"><span>P4 Latency</span><div class="bar-track"><div class="bar-fill orange" style="width:100%"></div></div><span>62.7s</span></div>
+      </div>
+    </section>
+
+    <!-- PROMPT 1 -->
+    <section id="prompt-1">
+      <h2>Prompt 1: ResearchAgentBench Benchmark Design</h2>
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+        <div class="score-ring score-high">7.5</div>
+        <div>
+          <strong>Điểm tổng thể: 7.5/10</strong><br>
+          <span style="color:var(--muted)">Đủ dùng cho lab meeting draft, chưa đủ publish benchmark</span>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card success">
+          <h4>Điểm mạnh</h4>
+          <ul>
+            <li>Đủ 10 mục yêu cầu (goal → v2 recommendations)</li>
+            <li>≥12 example tasks across categories</li>
+            <li>Rubric tách usefulness / correctness / research judgment</li>
+            <li>Có gaming risks &amp; adversarial stress test</li>
+          </ul>
+        </div>
+        <div class="card danger">
+          <h4>Điểm yếu</h4>
+          <ul>
+            <li>Tasks còn generic, thiếu I/O cụ thể</li>
+            <li>Gaming risks chưa sâu (cách detect)</li>
+            <li>Human eval protocol thiếu inter-rater agreement</li>
+            <li>Search ít hữu ích cho task thiết kế tài liệu</li>
+          </ul>
+        </div>
+      </div>
+      <h4>Trích output</h4>
+      <div class="toc-output">## 4. Example Tasks
+1. Literature Review: Summarize key findings from five recent papers...
+2. Data Analysis: Analyze a provided dataset and identify trends...
+...
+12. Presentation Preparation: Create an outline for a conference presentation...
+
+## 7. Likely Failure Modes and Gaming Risks
+- AI systems may produce superficially fluent text without substantive content
+- Systems might overfit to benchmark tasks
+- Potential for fabricated citations</div>
+    </section>
+
+    <!-- PROMPT 2 -->
+    <section id="prompt-2">
+      <h2>Prompt 2: Research Briefing on Multi-Agent LLMs</h2>
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+        <div class="score-ring score-high">8.0</div>
+        <div>
+          <strong>Điểm tổng thể: 8.0/10</strong> (cấu trúc) · <strong>9.0/10</strong> sau cải tiến Tavily<br>
+          <span style="color:var(--muted)">Phù hợp nhất với kiến trúc research + search</span>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card success">
+          <h4>Điểm mạnh</h4>
+          <ul>
+            <li>Đúng format: core question → final judgment</li>
+            <li>3 proposed experiments cụ thể</li>
+            <li>Nêu confounders: tokens, prompt engineering, self-reflection</li>
+            <li>Final judgment có uncertainty</li>
+            <li>Sau fix Tavily: sources thật (arxiv, superannotate)</li>
+          </ul>
+        </div>
+        <div class="card warn">
+          <h4>Điểm yếu (lần chạy đầu)</h4>
+          <ul>
+            <li>Citations trỏ mock example.com</li>
+            <li>Claims "empirical studies show…" thiếu paper cụ thể</li>
+            <li>Cần verify từng source thủ công</li>
+          </ul>
+        </div>
+      </div>
+      <h4>Trích output (cấu trúc)</h4>
+      <div class="toc-output">### Core Question
+Do multi-agent LLM systems actually outperform single-agent systems on complex tasks?
+
+### Proposed Experiments
+1. Controlled Task Comparison — same tasks, control token count
+2. Agent Specialization Analysis — varying agent diversity
+3. Iterative Learning Assessment — self-reflection vs multi-agent
+
+### Final Judgment
+...uncertainty persists regarding the true nature of performance gains...</div>
+    </section>
+
+    <!-- PROMPT 3 -->
+    <section id="prompt-3">
+      <h2>Prompt 3: Experimental Design — Single vs Multi-Agent</h2>
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+        <div class="score-ring score-high">8.0</div>
+        <div>
+          <strong>Điểm tổng thể: 8.0/10</strong><br>
+          <span style="color:var(--muted)">Proposal nội bộ lab khá dùng được</span>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card success">
+          <h4>Điểm mạnh</h4>
+          <ul>
+            <li>Token budget fairness (4096 tokens)</li>
+            <li>Red-team section cụ thể</li>
+            <li>Revised design sau red-team</li>
+            <li>ANOVA, randomization, control variables</li>
+          </ul>
+        </div>
+        <div class="card warn">
+          <h4>Điểm yếu</h4>
+          <ul>
+            <li>Revised design còn mỏng</li>
+            <li>Chưa tách ablation: same tokens vs same latency</li>
+            <li>Dataset chưa chỉ rõ bộ cụ thể</li>
+          </ul>
+        </div>
+      </div>
+      <h4>Trích output — Red-Team</h4>
+      <div class="toc-output">## 10. Red-Team Section
+- Token Budget Mismanagement: multi-agent may exceed budget via agent collaboration
+- Inference Time Bias: longer processing may appear as better performance
+- Task Design Bias: tasks easier for multi-agent skew results
+
+## 11. Revised Experiment Design
+- Strict token monitoring for both systems
+- Equal inference time limit (e.g. 5 minutes)
+- Balanced task design with pre-testing for equal difficulty</div>
+    </section>
+
+    <!-- PROMPT 4 -->
+    <section id="prompt-4">
+      <h2>Prompt 4: Survey Paper Blueprint</h2>
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+        <div class="score-ring score-mid">7.0</div>
+        <div>
+          <strong>Điểm tổng thể: 7.0/10</strong><br>
+          <span style="color:var(--muted)">Blueprint khởi đầu tốt, cần mở rộng</span>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card success">
+          <h4>Điểm mạnh</h4>
+          <ul>
+            <li>Có title, abstract, 8 sections</li>
+            <li>Mỗi section: purpose, themes, questions, pitfalls, open problems</li>
+            <li>Cảm giác survey thật, không phải blog</li>
+          </ul>
+        </div>
+        <div class="card warn">
+          <h4>Điểm yếu</h4>
+          <ul>
+            <li>Evaluation gaps chưa tách section riêng rõ</li>
+            <li>Open problems cần cụ thể hơn (paper references)</li>
+            <li>Thiếu citation vì task thiết kế, không cần search</li>
+          </ul>
+        </div>
+      </div>
+      <h4>Trích output — Section outline</h4>
+      <div class="toc-output">#### 1. Introduction — purpose, themes, pitfalls, open problems
+#### 2. Capabilities of AI Agents
+#### 3. Evaluation Methodologies
+...
+#### 8. Evaluation Gaps and Benchmarking
+- Purpose: Identify evaluation gaps and propose future benchmarks
+- Open Problems: Standardized benchmarks across domains</div>
+    </section>
+
+    <!-- TRACE EXPORT -->
+    <section id="trace-export">
+      <h2>Trace Export</h2>
+      <p>Mỗi lần chạy <code>multi-agent</code> hoặc <code>benchmark</code>, hệ thống tự export trace gồm <strong>spans (timing)</strong>, <strong>state events</strong>, <strong>routes</strong> và <strong>agent results</strong> ra JSON + Markdown.</p>
+
+      <div class="card success">
+        <h4>Module: <code>observability/trace_export.py</code></h4>
+        <ul>
+          <li><code>build_trace_payload()</code> — gộp <code>get_trace_buffer()</code> + <code>state.trace</code></li>
+          <li><code>render_trace_markdown()</code> — báo cáo bảng timing dễ đọc</li>
+          <li><code>export_trace()</code> — ghi file timestamped + <code>latest.json</code> / <code>latest.md</code></li>
+        </ul>
+      </div>
+
+      <h3>Lệnh export</h3>
+      <pre>python -m multi_agent_research_lab.cli multi-agent --query "What is GraphRAG?"
+python -m multi_agent_research_lab.cli multi-agent --query "..." --trace-dir reports/traces
+python -m multi_agent_research_lab.cli benchmark   # trace kèm trong benchmark_report.md
+python scripts/run_evaluation_prompts.py           # trace per prompt trong prompt_evaluations/traces/</pre>
+
+      <h3>File artifacts</h3>
+      <table>
+        <thead><tr><th>Đường dẫn</th><th>Nội dung</th></tr></thead>
+        <tbody>
+          <tr><td><code>reports/traces/latest.json</code></td><td>Trace JSON mới nhất (machine-readable)</td></tr>
+          <tr><td><code>reports/traces/latest.md</code></td><td>Báo cáo trace đọc được (human-readable)</td></tr>
+          <tr><td><code>reports/traces/{timestamp}_{slug}.json</code></td><td>Archive theo từng lần chạy</td></tr>
+          <tr><td><code>reports/prompt_evaluations/traces/</code></td><td>Trace riêng cho 4 evaluation prompts</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Ví dụ trace thực tế — Query: "What is GraphRAG?"</h3>
+      <p>Luồng có <strong>Critic revision loop</strong> (Writer bị gửi lại 1 lần vì citation coverage thấp):</p>
+      <div class="flow">
+        <span class="flow-step">researcher</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">analyst</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">writer</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step" style="border-color:#a78bfa">critic</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">writer</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step" style="border-color:#a78bfa">critic</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step" style="border-color:#10b981">done</span>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Metric</th><th class="num">Giá trị</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Spans ghi nhận</td><td class="num">15</td></tr>
+          <tr><td>State events</td><td class="num">13</td></tr>
+          <tr><td>Supervisor iterations</td><td class="num">7</td></tr>
+          <tr><td>Writer revisions</td><td class="num">1</td></tr>
+          <tr><td>Citation coverage (cuối)</td><td class="num">0.0</td></tr>
+          <tr><td>LangSmith</td><td class="num">off (chưa cấu hình key)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Bảng spans (timing)</h3>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Span</th><th>Agent / bước</th><th>Ghi chú</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><code>supervisor.route</code></td><td>Supervisor</td><td>next: researcher</td></tr>
+          <tr><td>2</td><td><code>researcher.search</code></td><td>Researcher</td><td>3 sources</td></tr>
+          <tr><td>3</td><td><code>researcher.summarize</code></td><td>Researcher</td><td>LLM tóm tắt sources</td></tr>
+          <tr><td>4</td><td><code>supervisor.route</code></td><td>Supervisor</td><td>next: analyst</td></tr>
+          <tr><td>5</td><td><code>analyst.analyze</code></td><td>Analyst</td><td>Phân tích claims</td></tr>
+          <tr><td>6</td><td><code>supervisor.route</code></td><td>Supervisor</td><td>next: writer</td></tr>
+          <tr><td>7</td><td><code>writer.compose</code></td><td>Writer</td><td>revision=false</td></tr>
+          <tr><td>8</td><td><code>supervisor.route</code></td><td>Supervisor</td><td>next: critic</td></tr>
+          <tr><td>9</td><td><code>critic.review</code></td><td>Critic</td><td>coverage=0.0, passed=false</td></tr>
+          <tr><td>10</td><td><code>supervisor.route</code></td><td>Supervisor</td><td>next: writer (revision)</td></tr>
+          <tr><td>11</td><td><code>writer.compose</code></td><td>Writer</td><td>revision=true</td></tr>
+          <tr><td>12</td><td><code>supervisor.route</code></td><td>Supervisor</td><td>next: critic</td></tr>
+          <tr><td>13</td><td><code>critic.review</code></td><td>Critic</td><td>coverage=0.0, passed=false</td></tr>
+          <tr><td>14</td><td><code>supervisor.route</code></td><td>Supervisor</td><td>next: done</td></tr>
+          <tr><td>15</td><td><code>workflow.run</code></td><td>Workflow</td><td>Tổng thời gian graph</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Cấu trúc JSON export</h3>
+      <pre>{
+  "exported_at": "2026-06-24T05:01:05+00:00",
+  "run_name": "multi-agent",
+  "query": "What is GraphRAG?",
+  "summary": {
+    "routes": ["researcher","analyst","writer","critic","writer","critic","done"],
+    "route_string": "researcher -> analyst -> writer -> critic -> writer -> critic -> done",
+    "span_count": 15,
+    "event_count": 13,
+    "citation_coverage": 0.0,
+    "writer_revisions": 1
+  },
+  "spans": [ ... ],
+  "events": [ ... ],
+  "agent_results": [ ... ]
+}</pre>
+
+      <div class="card highlight">
+        <strong>Giải thích trace (deliverable lab):</strong>
+        <ul>
+          <li><strong>Supervisor</strong> chạy 7 lần — mỗi lần quyết định agent tiếp theo</li>
+          <li><strong>Researcher</strong> search + summarize (2 spans)</li>
+          <li><strong>Analyst</strong> phân tích research notes (1 span)</li>
+          <li><strong>Writer</strong> viết 2 lần — lần 2 nhận feedback từ Critic</li>
+          <li><strong>Critic</strong> review 2 lần — cả 2 lần coverage &lt; 0.5 → không pass</li>
+          <li>Sau <code>MAX_WRITER_REVISIONS</code> hết quota → Supervisor chọn <code>done</code></li>
+        </ul>
+      </div>
+
+      <p>Xem file đầy đủ: <a href="traces/latest.md" style="color:#60a5fa">reports/traces/latest.md</a> · <a href="traces/latest.json" style="color:#60a5fa">reports/traces/latest.json</a></p>
+    </section>
+
+    <!-- FAILURE MODES -->
+    <section id="failure-modes">
+      <h2>Failure Modes &amp; Cách khắc phục</h2>
+      <table>
+        <thead>
+          <tr><th>Failure Mode</th><th>Triệu chứng</th><th>Cách fix đã áp dụng</th><th>Trạng thái</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tavily query quá dài</td>
+            <td>HTTP 400, mock sources example.com</td>
+            <td><code>extract_search_query()</code> truncate &lt; 400 chars</td>
+            <td><span class="badge green">Đã fix</span></td>
+          </tr>
+          <tr>
+            <td>Citation coverage thấp</td>
+            <td>Writer bỏ [n] refs, claims không có nguồn</td>
+            <td>Critic agent + Writer revision loop</td>
+            <td><span class="badge green">Đã fix</span></td>
+          </tr>
+          <tr>
+            <td>Max iterations</td>
+            <td>Supervisor dừng sớm, answer không hoàn chỉnh</td>
+            <td>Tăng MAX_ITERATIONS lên 10</td>
+            <td><span class="badge green">Đã fix</span></td>
+          </tr>
+          <tr>
+            <td>Task thiết kế tài liệu</td>
+            <td>Search web không giúp P1/P3/P4</td>
+            <td>Skip search hoặc route thẳng Analyst cho design tasks</td>
+            <td><span class="badge yellow">Đề xuất</span></td>
+          </tr>
+          <tr>
+            <td>Hallucinated citations</td>
+            <td>Claims có [n] nhưng source không support</td>
+            <td>Critic + human verification</td>
+            <td><span class="badge yellow">Một phần</span></td>
+          </tr>
+          <tr>
+            <td>Multi-agent overhead</td>
+            <td>Latency 3× baseline, cost 3×</td>
+            <td>Dùng multi-agent chỉ khi task cần decomposition</td>
+            <td><span class="badge blue">Trade-off</span></td>
+          </tr>
+          <tr>
+            <td>Thiếu trace artifact</td>
+            <td>Không có file trace để nộp bài / debug</td>
+            <td><code>trace_export.py</code> → JSON + MD tự động</td>
+            <td><span class="badge green">Đã fix</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- CONCLUSION -->
+    <section id="conclusion">
+      <h2>Kết luận</h2>
+      <div class="card highlight">
+        <h4>Khi nào nên dùng Multi-Agent?</h4>
+        <ul>
+          <li>Task nghiên cứu phức tạp cần <strong>thu thập → phân tích → viết</strong> tách bước</li>
+          <li>Cần trace rõ agent nào làm gì (debug, audit)</li>
+          <li>Cần citation và quality cao hơn, chấp nhận latency/cost</li>
+          <li>Prompt 2 (literature briefing) là use case lý tưởng</li>
+        </ul>
+      </div>
+      <div class="card warn">
+        <h4>Khi nào KHÔNG nên dùng Multi-Agent?</h4>
+        <ul>
+          <li>Task thiết kế tài liệu (P1, P3, P4) — single-agent dài có thể đạt tương đương</li>
+          <li>Cần response nhanh, cost thấp (chat, FAQ)</li>
+          <li>Task đơn giản không cần decomposition</li>
+        </ul>
+      </div>
+      <h3>Hướng phát triển tiếp</h3>
+      <ol>
+        <li>Route-aware search: bỏ search cho design tasks, tăng cho research tasks</li>
+        <li>Bật <code>LANGSMITH_API_KEY</code> để có trace UI trên cloud (local export đã có)</li>
+        <li>Human evaluation rubric (0-10) thay heuristic tự động</li>
+        <li>Peer review theo <code>docs/peer_review_rubric.md</code></li>
+      </ol>
+    </section>
+
+    <!-- APPENDIX -->
+    <section id="appendix">
+      <h2>Phụ lục</h2>
+      <h3>Lệnh chạy</h3>
+      <pre>source .venv/bin/activate
+make test
+python -m multi_agent_research_lab.cli baseline --query "..."
+python -m multi_agent_research_lab.cli multi-agent --query "..."   # auto-export trace
+python -m multi_agent_research_lab.cli benchmark                  # trace in report
+python scripts/run_evaluation_prompts.py
+open reports/traces/latest.md</pre>
+
+      <h3>Cấu hình môi trường</h3>
+      <pre>OPENAI_API_KEY=...
+OPENAI_MODEL=gpt-4o-mini
+TAVILY_API_KEY=...
+USE_CRITIC=true
+MIN_CITATION_COVERAGE=0.5
+MAX_WRITER_REVISIONS=2
+MAX_ITERATIONS=10</pre>
+
+      <h3>File báo cáo liên quan</h3>
+      <table>
+        <thead><tr><th>File</th><th>Mô tả</th></tr></thead>
+        <tbody>
+          <tr><td><code>reports/benchmark_report.md</code></td><td>So sánh single vs multi-agent</td></tr>
+          <tr><td><code>reports/traces/latest.md</code></td><td>Trace report (spans, events, routes)</td></tr>
+          <tr><td><code>reports/traces/latest.json</code></td><td>Trace JSON export</td></tr>
+          <tr><td><code>reports/prompt_evaluations/</code></td><td>Output &amp; metrics 4 prompts</td></tr>
+          <tr><td><code>reports/prompt_evaluations/traces/</code></td><td>Trace per evaluation prompt</td></tr>
+          <tr><td><code>reports/full_report.html</code></td><td>Báo cáo HTML này</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Cấu trúc repo</h3>
+      <pre>src/multi_agent_research_lab/
+├── agents/          # supervisor, researcher, analyst, writer, critic
+├── core/            # config, state, schemas, errors
+├── graph/           # LangGraph workflow
+├── services/        # llm_client, search_client
+├── evaluation/      # benchmark, report
+├── observability/   # logging, tracing, trace_export
+└── cli.py</pre>
+    </section>
+
+    <footer>
+      <p>Lab 20 — Multi-Agent Research System · VinUniversity AI Lab · Nguyễn Mạnh Hiệu (2A202600887)</p>
+      <p>Generated: 24 June 2026 · Model: gpt-4o-mini · Framework: LangGraph + OpenAI + Tavily</p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

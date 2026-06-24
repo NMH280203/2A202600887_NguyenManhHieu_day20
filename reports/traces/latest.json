@@ -1,0 +1,387 @@
+{
+  "exported_at": "2026-06-24T05:01:05.880672+00:00",
+  "run_name": "multi-agent",
+  "query": "What is GraphRAG?",
+  "summary": {
+    "routes": [
+      "researcher",
+      "analyst",
+      "writer",
+      "critic",
+      "writer",
+      "critic",
+      "done"
+    ],
+    "route_string": "researcher -> analyst -> writer -> critic -> writer -> critic -> done",
+    "iteration_count": 7,
+    "span_count": 15,
+    "event_count": 13,
+    "total_span_duration_seconds": 0.0056,
+    "citation_coverage": 0.0,
+    "writer_revisions": 1,
+    "source_count": 3,
+    "errors": [],
+    "langsmith_enabled": false
+  },
+  "spans": [
+    {
+      "name": "supervisor.route",
+      "attributes": {
+        "iteration": 0,
+        "next_route": "researcher",
+        "citation_coverage": null
+      },
+      "duration_seconds": 2.895800571423024e-05
+    },
+    {
+      "name": "researcher.search",
+      "attributes": {
+        "query": "What is GraphRAG?",
+        "source_count": 3
+      },
+      "duration_seconds": 3.2790994737297297e-05
+    },
+    {
+      "name": "researcher.summarize",
+      "attributes": {
+        "output_tokens": 160
+      },
+      "duration_seconds": 1.0124997061211616e-05
+    },
+    {
+      "name": "supervisor.route",
+      "attributes": {
+        "iteration": 1,
+        "next_route": "analyst",
+        "citation_coverage": null
+      },
+      "duration_seconds": 7.124996045604348e-06
+    },
+    {
+      "name": "analyst.analyze",
+      "attributes": {
+        "output_tokens": 160
+      },
+      "duration_seconds": 9.625000529922545e-06
+    },
+    {
+      "name": "supervisor.route",
+      "attributes": {
+        "iteration": 2,
+        "next_route": "writer",
+        "citation_coverage": null
+      },
+      "duration_seconds": 5.125002644490451e-06
+    },
+    {
+      "name": "writer.compose",
+      "attributes": {
+        "revision": false,
+        "writer_revisions": 0,
+        "output_tokens": 160
+      },
+      "duration_seconds": 9.41600592341274e-06
+    },
+    {
+      "name": "supervisor.route",
+      "attributes": {
+        "iteration": 3,
+        "next_route": "critic",
+        "citation_coverage": null
+      },
+      "duration_seconds": 5.041998520027846e-06
+    },
+    {
+      "name": "critic.review",
+      "attributes": {
+        "citation_coverage": 0.0
+      },
+      "duration_seconds": 9.625000529922545e-06
+    },
+    {
+      "name": "supervisor.route",
+      "attributes": {
+        "iteration": 4,
+        "next_route": "writer",
+        "citation_coverage": 0.0
+      },
+      "duration_seconds": 5.916001100558788e-06
+    },
+    {
+      "name": "writer.compose",
+      "attributes": {
+        "revision": true,
+        "writer_revisions": 0,
+        "output_tokens": 160
+      },
+      "duration_seconds": 5.041998520027846e-06
+    },
+    {
+      "name": "supervisor.route",
+      "attributes": {
+        "iteration": 5,
+        "next_route": "critic",
+        "citation_coverage": 0.0
+      },
+      "duration_seconds": 4.209003236610442e-06
+    },
+    {
+      "name": "critic.review",
+      "attributes": {
+        "citation_coverage": 0.0
+      },
+      "duration_seconds": 4.542001988738775e-06
+    },
+    {
+      "name": "supervisor.route",
+      "attributes": {
+        "iteration": 6,
+        "next_route": "done",
+        "citation_coverage": 0.0
+      },
+      "duration_seconds": 3.9579972508363426e-06
+    },
+    {
+      "name": "workflow.run",
+      "attributes": {
+        "query": "What is GraphRAG?",
+        "routes": [
+          "researcher",
+          "analyst",
+          "writer",
+          "critic",
+          "writer",
+          "critic",
+          "done"
+        ],
+        "errors": [],
+        "citation_coverage": 0.0
+      },
+      "duration_seconds": 0.00543758300045738
+    }
+  ],
+  "events": [
+    {
+      "name": "supervisor.route",
+      "payload": {
+        "next": "researcher",
+        "iteration": 1,
+        "citation_coverage": null,
+        "writer_revisions": 0
+      }
+    },
+    {
+      "name": "researcher.done",
+      "payload": {
+        "source_count": 3
+      }
+    },
+    {
+      "name": "supervisor.route",
+      "payload": {
+        "next": "analyst",
+        "iteration": 2,
+        "citation_coverage": null,
+        "writer_revisions": 0
+      }
+    },
+    {
+      "name": "analyst.done",
+      "payload": {}
+    },
+    {
+      "name": "supervisor.route",
+      "payload": {
+        "next": "writer",
+        "iteration": 3,
+        "citation_coverage": null,
+        "writer_revisions": 0
+      }
+    },
+    {
+      "name": "writer.done",
+      "payload": {
+        "revision": false,
+        "writer_revisions": 0
+      }
+    },
+    {
+      "name": "supervisor.route",
+      "payload": {
+        "next": "critic",
+        "iteration": 4,
+        "citation_coverage": null,
+        "writer_revisions": 0
+      }
+    },
+    {
+      "name": "critic.done",
+      "payload": {
+        "citation_coverage": 0.0,
+        "passed": false
+      }
+    },
+    {
+      "name": "supervisor.route",
+      "payload": {
+        "next": "writer",
+        "iteration": 5,
+        "citation_coverage": 0.0,
+        "writer_revisions": 0
+      }
+    },
+    {
+      "name": "writer.done",
+      "payload": {
+        "revision": true,
+        "writer_revisions": 1
+      }
+    },
+    {
+      "name": "supervisor.route",
+      "payload": {
+        "next": "critic",
+        "iteration": 6,
+        "citation_coverage": 0.0,
+        "writer_revisions": 1
+      }
+    },
+    {
+      "name": "critic.done",
+      "payload": {
+        "citation_coverage": 0.0,
+        "passed": false
+      }
+    },
+    {
+      "name": "supervisor.route",
+      "payload": {
+        "next": "done",
+        "iteration": 7,
+        "citation_coverage": 0.0,
+        "writer_revisions": 1
+      }
+    }
+  ],
+  "agent_results": [
+    {
+      "agent": "supervisor",
+      "metadata": {
+        "next_route": "researcher",
+        "citation_coverage": null
+      },
+      "content_preview": "Routing to researcher"
+    },
+    {
+      "agent": "researcher",
+      "metadata": {
+        "source_count": 3,
+        "input_tokens": 80,
+        "output_tokens": 160,
+        "cost_usd": 0.0
+      },
+      "content_preview": "[mock LLM response] Summarized findings for: Query: What is GraphRAG?  Sources: [1] Overview of What is GraphRAG? URL: https://example.com/1 Source 1 discusses What ... Key points include relevant bac…"
+    },
+    {
+      "agent": "supervisor",
+      "metadata": {
+        "next_route": "analyst",
+        "citation_coverage": null
+      },
+      "content_preview": "Routing to analyst"
+    },
+    {
+      "agent": "analyst",
+      "metadata": {
+        "input_tokens": 80,
+        "output_tokens": 160,
+        "cost_usd": 0.0
+      },
+      "content_preview": "[mock LLM response] Summarized findings for: Original query: What is GraphRAG?  Research notes: [mock LLM response] Summarized findings for: Query: What is GraphRAG?... Key points include relevant bac…"
+    },
+    {
+      "agent": "supervisor",
+      "metadata": {
+        "next_route": "writer",
+        "citation_coverage": null
+      },
+      "content_preview": "Routing to writer"
+    },
+    {
+      "agent": "writer",
+      "metadata": {
+        "revision": false,
+        "writer_revisions": 0,
+        "input_tokens": 80,
+        "output_tokens": 160,
+        "cost_usd": 0.0
+      },
+      "content_preview": "[mock LLM response] Summarized findings for: Query: What is GraphRAG?  Research notes: [mock LLM response] Summarized findings for: Query: What is GraphRAG?  Sources... Key points include relevant bac…"
+    },
+    {
+      "agent": "supervisor",
+      "metadata": {
+        "next_route": "critic",
+        "citation_coverage": null
+      },
+      "content_preview": "Routing to critic"
+    },
+    {
+      "agent": "critic",
+      "metadata": {
+        "citation_coverage": 0.0,
+        "passed": false,
+        "input_tokens": 80,
+        "output_tokens": 160,
+        "cost_usd": 0.0
+      },
+      "content_preview": "[mock LLM response] Summarized findings for: Query: What is GraphRAG?  Answer: [mock LLM response] Summarized findings for: Query: What is GraphRAG?  Research notes:... Key points include relevant bac…"
+    },
+    {
+      "agent": "supervisor",
+      "metadata": {
+        "next_route": "writer",
+        "citation_coverage": 0.0
+      },
+      "content_preview": "Routing to writer"
+    },
+    {
+      "agent": "writer",
+      "metadata": {
+        "revision": true,
+        "writer_revisions": 1,
+        "input_tokens": 80,
+        "output_tokens": 160,
+        "cost_usd": 0.0
+      },
+      "content_preview": "[mock LLM response] Summarized findings for: Query: What is GraphRAG?  Research notes: [mock LLM response] Summarized findings for: Query: What is GraphRAG?  Sources... Key points include relevant bac…"
+    },
+    {
+      "agent": "supervisor",
+      "metadata": {
+        "next_route": "critic",
+        "citation_coverage": 0.0
+      },
+      "content_preview": "Routing to critic"
+    },
+    {
+      "agent": "critic",
+      "metadata": {
+        "citation_coverage": 0.0,
+        "passed": false,
+        "input_tokens": 80,
+        "output_tokens": 160,
+        "cost_usd": 0.0
+      },
+      "content_preview": "[mock LLM response] Summarized findings for: Query: What is GraphRAG?  Answer: [mock LLM response] Summarized findings for: Query: What is GraphRAG?  Research notes:... Key points include relevant bac…"
+    },
+    {
+      "agent": "supervisor",
+      "metadata": {
+        "next_route": "done",
+        "citation_coverage": 0.0
+      },
+      "content_preview": "Routing to done"
+    }
+  ]
+}

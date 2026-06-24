@@ -1,0 +1,63 @@
+[
+  {
+    "id": "prompt_1",
+    "name": "ResearchAgentBench Benchmark Design",
+    "required_sections": [
+      "benchmark goal",
+      "core assumptions",
+      "task categories",
+      "example tasks",
+      "scoring rubric",
+      "baselines",
+      "failure modes",
+      "human evaluation",
+      "limitations",
+      "version 2"
+    ],
+    "query": "You are part of a university lab designing a benchmark to evaluate AI systems that assist students with research tasks.\n\nYour task is to design a benchmark called ResearchAgentBench.\n\nThe benchmark should evaluate whether an AI system can actually help a graduate student complete research work, not just produce fluent text.\n\nYou must produce a full benchmark design document that includes:\n1. Benchmark goal\n2. Core assumptions\n3. Task categories\n4. At least 12 example tasks across different categories\n5. A scoring rubric\n6. Baselines to compare against\n7. Likely failure modes and gaming risks\n8. Human evaluation protocol\n9. Limitations of the benchmark\n10. Recommendations for version 2 of the benchmark\n\nConstraints:\n- The benchmark must be realistic for a small academic lab\n- It must not depend on expensive annotation\n- It must distinguish between usefulness, correctness, and research judgment\n- It must include at least one adversarial or stress-test component\n- It must explicitly discuss how systems might game the evaluation\n\nOutput format:\nWrite this as a mini design document suitable for discussion in a research lab meeting."
+  },
+  {
+    "id": "prompt_2",
+    "name": "Research Briefing on Multi-Agent LLMs",
+    "required_sections": [
+      "core question",
+      "main positions",
+      "evidence for",
+      "evidence against",
+      "methodological concerns",
+      "proposed experiments",
+      "final judgment"
+    ],
+    "query": "You are helping a PhD student prepare a research briefing on the topic:\n\n\"Do multi-agent LLM systems actually outperform single-agent systems on complex tasks?\"\n\nYour task is not just to summarize the topic. You must produce a structured research briefing that:\n1. Defines the main claim precisely\n2. Breaks the literature into major positions or schools of thought\n3. Identifies arguments supporting the claim\n4. Identifies arguments challenging the claim\n5. Explains where empirical evidence is weak, incomplete, or confounded\n6. Distinguishes between true multi-agent gains and gains caused by other factors such as more tokens, more prompt engineering, or repeated self-reflection\n7. Proposes 3 concrete experiments that could better resolve the debate\n8. Ends with a balanced final judgment\n\nConstraints:\n- Do not write a generic overview\n- Explicitly discuss what kinds of evidence would count as convincing\n- The final judgment must include uncertainty and unresolved issues\n- Organize the answer so it could be used as speaking notes for a research group meeting\n\nOutput format:\n- Core question\n- Main positions\n- Evidence for\n- Evidence against\n- Methodological concerns\n- Proposed experiments\n- Final judgment"
+  },
+  {
+    "id": "prompt_3",
+    "name": "Experimental Design Single-Call vs Multi-Agent",
+    "required_sections": [
+      "research question",
+      "hypotheses",
+      "task design",
+      "datasets",
+      "fair comparison",
+      "metrics",
+      "human evaluation",
+      "statistical",
+      "expected results",
+      "red-team",
+      "revised experiment"
+    ],
+    "query": "You are designing a research experiment to compare a single-call LLM system with a multi-agent LLM system on complex research tasks.\n\nYour deliverable must be a complete experimental plan.\n\nYou must include:\n1. The research question\n2. Hypotheses\n3. Task design\n4. Datasets or source materials\n5. Fair comparison setup\n6. Metrics\n7. Human evaluation criteria\n8. Statistical or methodological considerations\n9. Expected results and alternative interpretations\n10. A red-team section explaining how the experiment could be misleading, unfair, or easy to game\n11. A revised experiment design after taking the red-team critique seriously\n\nConstraints:\n- You must explicitly address token budget fairness\n- You must explain how to avoid giving the multi-agent system an unfair advantage\n- You must discuss how to separate gains from decomposition vs gains from more inference time\n- The red-team critique must be concrete, not superficial\n\nOutput format:\nWrite the answer as a structured internal lab proposal."
+  },
+  {
+    "id": "prompt_4",
+    "name": "Survey Paper Blueprint",
+    "required_sections": [
+      "title",
+      "abstract",
+      "outline",
+      "evaluation gaps",
+      "future benchmark"
+    ],
+    "query": "You are helping prepare a survey paper titled:\n\n\"AI Agents for Research Assistance: Capabilities, Evaluation, and Open Problems\"\n\nYour task is to create a detailed survey blueprint that a graduate student could actually use to write the paper.\n\nYou must produce:\n1. A proposed paper title\n2. A draft abstract\n3. A section-by-section outline with 6 to 8 main sections\n4. For each section:\n   - purpose of the section\n   - key themes\n   - questions the section should answer\n   - likely pitfalls\n   - open problems\n5. A final section identifying the most important evaluation gaps in current research\n6. A section explaining what a strong future benchmark should measure\n\nConstraints:\n- The sections should not overlap too much\n- The outline should feel like a real survey, not a blog post\n- Open problems must be specific\n- The final product should be useful as a writing plan, not just a topic list"
+  }
+]
